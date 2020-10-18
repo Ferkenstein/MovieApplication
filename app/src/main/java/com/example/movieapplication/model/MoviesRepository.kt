@@ -2,9 +2,11 @@ package com.example.movieapplication.model
 
 import android.util.Log
 import com.example.movieapplication.model.localRoom.MovieEntity
+import com.example.movieapplication.model.localRoom.MoviePopularEntity
 import com.example.movieapplication.model.localRoom.MoviesDao
 import com.example.movieapplication.model.network.RetrofitClient
 import com.example.movieapplication.model.pojos.Movie
+import com.example.movieapplication.model.pojos.MovieList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,13 +22,14 @@ class MoviesRepository(private val moviesDao: MoviesDao) {
 
     fun getDataFromServer() {
         val call = retroService.allPopularMovies()
-        call.enqueue(object : retrofit2.Callback<List<Movie>>{
+        call.enqueue(object : retrofit2.Callback<MovieList>{
             override fun onResponse(
-                call: Call<List<Movie>>,
-                response: Response<List<Movie>>
+                call: Call<MovieList>,
+                response: Response<MovieList>
             ) {
                 when(response.code()) {
                     in 200..299 -> CoroutineScope(Dispatchers.IO).launch {
+                        Log.d("RESPONSEOK", response.body().toString())
                         response.body()?.let {
                             moviesDao.insertAllPopularMovies(convert(it))
                         }
@@ -36,14 +39,14 @@ class MoviesRepository(private val moviesDao: MoviesDao) {
                 }
             }
 
-            override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
+            override fun onFailure(call: Call<MovieList>, t: Throwable) {
                 Log.e("Error!", t.message.toString())
             }
         })
     }
 
     // Transformar datos desde Internet hacia la Entidad
-    fun convert(listFromNetwork: List<Movie>): List<MovieEntity> {
+    fun convert(listFromNetwork: MovieList): List<MovieEntity> {
         val listMutable = mutableListOf<MovieEntity>()
 
         listFromNetwork.map {
