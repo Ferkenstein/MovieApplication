@@ -2,7 +2,6 @@ package com.example.movieapplication.model
 
 import android.util.Log
 import com.example.movieapplication.model.localRoom.MovieEntity
-import com.example.movieapplication.model.localRoom.MoviePopularEntity
 import com.example.movieapplication.model.localRoom.MoviesDao
 import com.example.movieapplication.model.network.RetrofitClient
 import com.example.movieapplication.model.pojos.Movie
@@ -35,7 +34,7 @@ class MoviesRepository(private val moviesDao: MoviesDao) {
                         }
                     }
                     in 300..399 -> Log.d("Response", response.errorBody().toString())
-                    else -> Log.d("Error!", response.errorBody().toString())
+                    else -> Log.d("Error300!", response.errorBody().toString())
                 }
             }
 
@@ -49,7 +48,7 @@ class MoviesRepository(private val moviesDao: MoviesDao) {
     fun convert(listFromNetwork: MovieList): List<MovieEntity> {
         val listMutable = mutableListOf<MovieEntity>()
 
-        listFromNetwork.map {
+        listFromNetwork.results.map {
             listMutable.add( MovieEntity(it.id,
                 it.posterPath,
                 it.originalTitle,
